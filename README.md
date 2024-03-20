@@ -2,13 +2,13 @@
 Projet Naoufel DÃ©veloppement d'interface OCR avec Azure
 
 
-#Context:
+#Context
 Vous travaillez en tant que développeur⸱se en IA pour le compte d’une ESN.
 Un client exprime un besoin d’évolution pour sa procédure de pré-traitement des factures fournisseurs. Le client souhaite étendre les fonctionnalités de pré-traitement au-delà avec des fonctionnalités d’OCR (ou “reconnaissance optique de caractères”) afin d’obtenir un reporting automatisé de sa comptabilité fournisseurs.
 
 Le client en question vous donne accès aux sources de sa procédure de traitement : API d'accès aux factures numérisées
 
-#Attendus:
+#Attendus
 En tant que développeur⸱se en IA pour le compte d’une ESN, vous devez :
 
 Intégrer la connexion à l’API Azure Cognitives Services
@@ -21,7 +21,7 @@ Automatiser le processus complet, depuis la facture jusqu'au stockage en base de
 Intégrer les résultats dans une interface web simple
 Documenter, versionner, livrer
 
-#Livrables:
+#Livrables
 - Une base de données alimentées
 - Dépôt Github : avec .gitignore, requirements.txt, readme, et tous les autres scripts
 - Un rapport écrit de 5 pages mini : présentation du projet, présentation de l'OCR (principe, méthode et fonctionnement, limites, etc.)
@@ -38,7 +38,7 @@ Documenter, versionner, livrer
 -- Liste des spécifications fonctionnelles de l’application
 
 
-#Critères de performances:
+#Critères de performances
 L'application finale doit :
 - Correspondre aux objectifs énoncés
 - Intégrer tous les services nécessaires à son bon fonctionnement
