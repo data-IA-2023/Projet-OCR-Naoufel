@@ -14,16 +14,25 @@ liste , status , url,dico = année(2023)
 dico_ocr = OCR(dico,url)
 print(dico_ocr.keys())
 
+listequantité=[]
 listenom=[]
-listedate =[]
+listedate=[]
+listeprix=[]
+listeproduits=[]
+
 for key in dico_ocr.keys():
     row=dico_ocr[key]
     listenom.append(row[0])
     listedate.append(row[1])
-  
+    listeprix.append(row[-1])
+    listeproduits.append(row[-3])
+    listequantité.append(row[-4])
     
-df= pd.DataFrame({"Nom_Facture":listenom,
-                      "Date_Facture":listedate
+df= pd.DataFrame({     "Nom_Facture":listenom,
+                      "Date_Facture":listedate,
+                      "Total_Facture":listeprix,
+                      "Produces":listeproduits,
+                      "Quantité":listequantité
                  
 
                   },index=dico_ocr.keys())
