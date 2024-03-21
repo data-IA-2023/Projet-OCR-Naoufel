@@ -1,0 +1,7 @@
+numpy
+pandas
+python-dotenv
+requests
+azure-ai-vision-imageanalysis
+
+
