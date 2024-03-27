@@ -1,128 +1,153 @@
-"""import os
-from azure.ai.vision.imageanalysis import ImageAnalysisClient
-from azure.ai.vision.imageanalysis.models import VisualFeatures
-from azure.core.credentials import AzureKeyCredential
-from dotenv import load_dotenv
-# Set the values of your computer vision endpoint and computer vision key
-# as environment variables:
-
-def OCR(doc,url):
-    dico_ocr = {}
-    
-    load_dotenv()
-    for key in doc.keys():
-        #yolo = doc[key]
-        for titre in doc[key]:
-            liste = []
-            try:
-                endpoint = os.environ["VISION_ENDPOINT"]
-                key = os.environ["VISION_KEY"]
-            except KeyError:
-                print("Missing environment variable 'VISION_ENDPOINT' or 'VISION_KEY'")
-                print("Set them before running this sample.")
-                exit()
-
-            # Create an Image Analysis client
-            client = ImageAnalysisClient(
-                endpoint=endpoint,
-                credential=AzureKeyCredential(key)
-            )
-            #for mon_fichier in liste:
-            # Get a caption for the image. This will be a synchronously (blocking) call.
-            result = client.analyze_from_url(
-                image_url= url+ f"/{titre}",
-                visual_features=[VisualFeatures.CAPTION, VisualFeatures.READ],
-                gender_neutral_caption=True,  # Optional (default is False)
-            )
-
-            print("-----------Resultat Analyse OCR---------------:")
-            print(titre)
-            print(" Read:")
-            if result.read is not None:
-                for line in result.read.blocks[0].lines:
-                    print(line.text,)
-                    liste.append(line.text)
-                    dico_ocr[titre]=liste
-                
-                    #for word in line.words:
-                        #print(f"     mots: '{word.text}', Position {word.bounding_polygon}, Confiance {word.confidence:.4f}")
-            
-      
-
-    return dico_ocr"""
-
-
-
 from azure.cognitiveservices.vision.computervision import ComputerVisionClient
 from azure.cognitiveservices.vision.computervision.models import OperationStatusCodes
+from azure.cognitiveservices.vision.computervision.models import VisualFeatureTypes
 from msrest.authentication import CognitiveServicesCredentials
+
+
 import os
-from dotenv import load_dotenv
 import time
 
-load_dotenv()
+import time
 
-dico = {}
+def OCR(titre):
+    print(titre)
+    liste = []
+    '''
+    Authenticate
+    Authenticates your credentials and creates a client.
+    '''
+    url = os.environ["URL"]
+    subscription_key = os.environ["VISION_KEY"]
+    endpoint = os.environ["VISION_ENDPOINT"]
+    computervision_client = ComputerVisionClient(endpoint, CognitiveServicesCredentials(subscription_key))
+    image_url =f"{url}/{titre}"
+    print("===== Tag an image - remote =====")
+    read_response = computervision_client.read(image_url,  raw=True)# Call API with URL and raw response (allows you to get the operation location)# Call API with remote image
+    read_operation_location = read_response.headers["Operation-Location"]
+    operation_id = read_operation_location.split("/")[-1]
+    while True:
+        read_result = computervision_client.get_read_result(operation_id)
+        if read_result.status not in ['notStarted', 'running']:
+            break
+        time.sleep(1)
+    if read_result.status == OperationStatusCodes.succeeded:
+        for text_result in read_result.analyze_result.read_results:
+            
+            preligne = ""
+            preH = 150
+            
+            for line in text_result.lines:
+                if abs(line.bounding_box[-1]-preH)<9:
 
-# Authenticate
-subscription_key = os.environ["VISION_KEY"]
-endpoint = os.environ["VISION_ENDPOINT"]
+                    if preH == None:
+                        preH = line.bounding_box[-1]
+                    
+                    preligne = preligne + f' {line.text}'
+                    if liste[-1] in preligne:
+                        liste[-1]= preligne
+                    print("preH",preH)
+                    print("preligne",preligne)
+                    print('-----------------------')
+                else:
+                    preH = line.bounding_box[-1]
+                    preligne = line.text
+                    print("line.text",line.text)
+                    print("line.box",line.bounding_box[-1])
+                    print("preligne",preligne)
+                    print(preH)
+                    liste.append(line.text)
+            
+                    
+                print("------------------------------------------LIGNE SUIVANTE--------------------------------")
+            print(liste)
 
-computervision_client = ComputerVisionClient(endpoint, CognitiveServicesCredentials(subscription_key))
+               
+    print()
+    print("End of Computer Vision quickstart.")
 
-print("===== Read File =====")
-read_image_url = "https://invoiceocrp3.azurewebsites.net/invoices/FAC_2024_0009-8145984"
-
-# Call API with URL and raw response
-read_response = computervision_client.read(read_image_url,  raw=True)
-
-read_operation_location = read_response.headers["Operation-Location"]
-operation_id = read_operation_location.split("/")[-1]
-
-while True:
-    read_result = computervision_client.get_read_result(operation_id)
-    if read_result.status not in ['notStarted', 'running']:
-        break
-    time.sleep(1)
-
-if read_result.status == OperationStatusCodes.succeeded:
-    for text_result in read_result.analyze_result.read_results:
-        for line in text_result.lines:
-            dico[line.text] = line.bounding_box
-
-print("End of Computer Vision ")
-
-# Fonction pour vérifier si deux boîtes englobantes sont sur la même ligne horizontale
-def same_horizontal_line(box1, box2):
-    # Compare les coordonnées y des deux boîtes englobantes avec une tolérance de 5 pixels
-    return abs(box1[1] - box2[1]) < 5  # Tolérance de 5 pixels
+    return
 
 
-# Groupe les mots sur la même ligne
-grouped_lines = {}
 
-# Parcoure le dictionnaire
-for text, bbox in dico.items():
-    # Vérifie si la ligne existe déjà dans grouped_lines
-    if len(grouped_lines) == 0:
-        grouped_lines[0] = []
-        grouped_lines[0].append(text)
-    else:
-        # Vérifie si le texte est sur la même ligne qu'un texte précédent
-        grouped = False
-        for group_key, group_value in grouped_lines.items():
-            group_bbox = dico[group_value[0]]
-            if same_horizontal_line(bbox, group_bbox):
-                grouped_lines[group_key].append(text)
-                grouped = True
-                break
-        # Si le texte n'est pas sur la même ligne qu'un texte précédent, crée une nouvelle ligne
-        if not grouped:
-            new_key = max(grouped_lines.keys()) + 1
-            grouped_lines[new_key] = [text]
 
-# Affiche les lignes groupées
-for key, value in grouped_lines.items():
-    print("Texte extrait de la ligne", key + 1, ":")
-    print(" ".join(value))
-    print("=" * 30)
+
+
+
+""" # Récupérer les coordonnées y de la boîte de délimitation de la ligne
+                y_coordinate = line.bounding_box[1]
+
+                # Si la coordonnée y existe déjà dans le dictionnaire, ajouter la ligne à la liste correspondante
+                if y_coordinate in lines_by_y:
+                    lines_by_y[y_coordinate].append(line)
+                # Sinon, créer une nouvelle liste avec la ligne
+                else:
+                    lines_by_y[y_coordinate] = [line]
+
+        # Trier les lignes par coordonnée y
+        sorted_lines = sorted(lines_by_y.items(), key=lambda x: x[0])
+
+        # Parcourir les groupes de lignes
+        for _, lines in sorted_lines:
+            # Trier les lignes par coordonnée x
+            sorted_lines_x = sorted(lines, key=lambda x: x.bounding_box[0])
+
+            # Récupérer les textes des lignes
+            texts = [line.text.strip() for line in sorted_lines_x]
+
+            # Fusionner les textes proches horizontalement
+            merged_texts = []
+            current_text = texts[0]
+            for text in texts[1:]:
+                # Récupérer les coordonnées x maximales de la ligne actuelle et précédente
+                x_max_current = sorted_lines_x[texts.index(text)].bounding_box[2]
+                x_max_prev = sorted_lines_x[texts.index(current_text)].bounding_box[2]
+                # Si la distance horizontale entre les lignes est inférieure à 50, fusionner les textes
+                if x_max_current - x_max_prev < 10:
+                    current_text += ' ' + text
+                else:
+                    merged_texts.append(current_text)
+                    current_text = text
+            merged_texts.append(current_text)
+
+            # Afficher les lignes fusionnées
+            for text in merged_texts:
+                print(text)
+            print()"""
+
+
+
+
+
+
+
+
+
+
+"""def OCR(titre):
+    '''
+    Authenticate
+    Authenticates your credentials and creates a client.
+    '''
+    url = os.environ["URL"]
+    subscription_key = os.environ["VISION_KEY"]
+    endpoint = os.environ["VISION_ENDPOINT"]
+    computervision_client = ComputerVisionClient(endpoint, CognitiveServicesCredentials(subscription_key))
+    image_url =f"{url}/{titre}"
+    print("===== Tag an image - remote =====")
+    read_response = computervision_client.read(image_url,  raw=True)# Call API with URL and raw response (allows you to get the operation location)# Call API with remote image
+    read_operation_location = read_response.headers["Operation-Location"]
+    operation_id = read_operation_location.split("/")[-1]
+    while True:
+        read_result = computervision_client.get_read_result(operation_id)
+        if read_result.status not in ['notStarted', 'running']:
+            break
+        time.sleep(1)
+    if read_result.status == OperationStatusCodes.succeeded:
+        for text_result in read_result.analyze_result.read_results:
+            for line in text_result.lines:
+                print(line.text)
+                #print(line.bounding_box)
+    print()
+    print("End of Computer Vision quickstart.")
+
+    return"""

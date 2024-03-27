@@ -1,19 +1,25 @@
 
 import pandas as pd
-#from AzurComputerVivsion import OCR
-from pytesseractocr import OCR
-from load_data import année
+from AzurComputerVivsion import OCR
+from load_data import liste_fichier
+
+dico_nom_fichier = liste_fichier()
+
+
+
+#for année in dico_nom_fichier['liste_dico_fichier'].keys():
+for titre in dico_nom_fichier['liste_dico_fichier'][2024]:
+    OCR(titre)
 
 
 
 
 
 
-liste , status , url,dico = année(2024) 
 
-print(dico.keys())
 
-OCR(dico,url)
+
+
 
 
 

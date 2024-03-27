@@ -4,6 +4,64 @@ import os
 
 load_dotenv()
 
+def liste_fichier():
+    """
+
+    
+    
+    
+    """
+    année = 2019
+    liste_dico_fichier={}
+    while True:
+        liste = []
+        header = {'Accept': 'application/json'}
+        url = os.getenv('URL')
+        response = requests.get(url+f"?start_date={année}-01", headers = header)
+        status = response.status_code 
+        #print(response)   
+            # Vérifier si la requête a réussi (code de statut 200)
+        if status == 200:
+            # Afficher le contenu de la réponse (les documents)
+            documents = response.json()
+            for doc in documents["invoices"]:
+                liste.append(doc["no"])
+            
+            if liste == [] or liste == None:
+                break
+            else:
+                liste_dico_fichier[année] = liste
+                année+=1
+        
+        
+    
+
+    return {"liste_dico_fichier":liste_dico_fichier}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def rechercheNom(année):
     liste = []
     url = os.getenv('URL')
@@ -18,6 +76,7 @@ def rechercheNom(année):
         for doc in documents["invoices"]:
             #print(doc)
             liste.append(doc['no'])
+            
     else:
         # Si la requête a échoué, afficher le code d'erreur
         print(f"La requête a échoué avec le code d'erreur : {response.status_code}")
@@ -28,10 +87,12 @@ def rechercheNom(année):
 
 def année(année):
     dico = {}
+    
     while True:
         
         try:
             liste , status , url = rechercheNom(année)
+            
             if liste == [] or liste == None:
                 break
             else:
