@@ -1,6 +1,7 @@
 
 import pandas as pd
-from AzurComputerVivsion import OCR
+#from AzurComputerVivsion import OCR
+from pytesseractocr import OCR
 from load_data import année
 
 
@@ -8,12 +9,15 @@ from load_data import année
 
 
 
-liste , status , url,dico = année(2023) 
+liste , status , url,dico = année(2024) 
+
+print(dico.keys())
+
+OCR(dico,url)
 
 
-dico_ocr = OCR(dico,url)
-print(dico_ocr.keys())
 
+"""
 listequantité=[]
 listenom=[]
 listedate=[]
@@ -40,7 +44,7 @@ df= pd.DataFrame({     "Nom_Facture":listenom,
 
 print(df)
 
-
+"""
 
 
 

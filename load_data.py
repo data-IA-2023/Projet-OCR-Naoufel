@@ -24,6 +24,8 @@ def rechercheNom(année):
     return liste , status , url
 
 
+
+
 def année(année):
     dico = {}
     while True:
@@ -40,6 +42,7 @@ def année(année):
             print("Error documents non trouvés")
             break
     return liste , status , url , dico
+
 
 
 """
