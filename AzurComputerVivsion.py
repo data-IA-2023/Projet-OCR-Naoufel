@@ -3,14 +3,24 @@ from azure.cognitiveservices.vision.computervision.models import OperationStatus
 from azure.cognitiveservices.vision.computervision.models import VisualFeatureTypes
 from msrest.authentication import CognitiveServicesCredentials
 
-
+from preprocessingimage import telecharger_modif_img
 import os
 import time
+import requests
+import re
+from PIL import Image, ImageEnhance
+from io import BytesIO
+from qrcode import decode_qr_code
 
-import time
+
+
+
+
+
+
 
 def OCR(titre):
-    print(titre)
+    # print(titre)
     liste = []
     '''
     Authenticate
@@ -20,60 +30,142 @@ def OCR(titre):
     subscription_key = os.environ["VISION_KEY"]
     endpoint = os.environ["VISION_ENDPOINT"]
     computervision_client = ComputerVisionClient(endpoint, CognitiveServicesCredentials(subscription_key))
+    url = os.environ["URL"]
     image_url =f"{url}/{titre}"
-    print("===== Tag an image - remote =====")
-    read_response = computervision_client.read(image_url,  raw=True)# Call API with URL and raw response (allows you to get the operation location)# Call API with remote image
-    read_operation_location = read_response.headers["Operation-Location"]
-    operation_id = read_operation_location.split("/")[-1]
-    while True:
-        read_result = computervision_client.get_read_result(operation_id)
-        if read_result.status not in ['notStarted', 'running']:
-            break
-        time.sleep(1)
-    if read_result.status == OperationStatusCodes.succeeded:
-        for text_result in read_result.analyze_result.read_results:
-            
-            preligne = ""
-            preH = 150
-            
-            for line in text_result.lines:
-                if abs(line.bounding_box[-1]-preH)<9:
-
-                    if preH == None:
+    response = requests.get(image_url)
+    # Vérification du statut de la réponse
+    if response.status_code == 200:
+        telecharger_modif_img(response)
+    qr_code_data = decode_qr_code()
+    # print("Contenu du QR code:", qr_code_data)
+    with open("C:/Users/naouf/Documents/1-Naoufel/1-projet/6-OCR/Projet-OCR-Naoufel/stockage.jpg", "rb") as f:
+        # print("===== Tag an image - remote =====")
+        read_response = computervision_client.read_in_stream(f,  raw=True)# Call API with URL and raw response (allows you to get the operation location)# Call API with remote image
+        read_operation_location = read_response.headers["Operation-Location"]
+        operation_id = read_operation_location.split("/")[-1]
+        while True:
+            read_result = computervision_client.get_read_result(operation_id)
+            if read_result.status not in ['notStarted', 'running']:
+                break
+            time.sleep(1)
+        if read_result.status == OperationStatusCodes.succeeded:
+            for text_result in read_result.analyze_result.read_results:
+                preligne = ""
+                preH = 150
+                for line in text_result.lines:
+                    if abs(line.bounding_box[-1]-preH)<9:
+                        if preH == None:
+                            preH = line.bounding_box[-1]
+                        preligne = preligne + f' {line.text}'
+                        if liste[-1] in preligne:
+                            liste[-1]= preligne
+                        # print("preH",preH)
+                        # print("preligne",preligne)
+                        # print('-----------------------')
+                    else:
                         preH = line.bounding_box[-1]
-                    
-                    preligne = preligne + f' {line.text}'
-                    if liste[-1] in preligne:
-                        liste[-1]= preligne
-                    print("preH",preH)
-                    print("preligne",preligne)
-                    print('-----------------------')
-                else:
-                    preH = line.bounding_box[-1]
-                    preligne = line.text
-                    print("line.text",line.text)
-                    print("line.box",line.bounding_box[-1])
-                    print("preligne",preligne)
-                    print(preH)
-                    liste.append(line.text)
-            
-                    
-                print("------------------------------------------LIGNE SUIVANTE--------------------------------")
-            print(liste)
+                        preligne = line.text
+                        liste.append(line.text)
+                        # print("line.text",line.text)
+                        # print("line.box",line.bounding_box[-1])
+                        # print("preligne",preligne)
+                        # print(preH)
+        return {"liste":liste,"qr_code_data":qr_code_data}
 
+
+
+
+
+
+"""
+from azure.cognitiveservices.vision.computervision import ComputerVisionClient
+from azure.cognitiveservices.vision.computervision.models import OperationStatusCodes
+from azure.cognitiveservices.vision.computervision.models import VisualFeatureTypes
+from msrest.authentication import CognitiveServicesCredentials
+
+from preprocessingimage import telecharger_modif_img
+from qrcode import decode_qr_code
+
+
+import os
+import time
+import requests
+
+
+
+
+def OCR(titre):
+    #print(titre)
+    liste = []
+    '''
+    Authenticate
+    Authenticates your credentials and creates a client.
+    '''
+    url = os.environ["URL"]
+    subscription_key = os.environ["VISION_KEY"]
+    endpoint = os.environ["VISION_ENDPOINT"]
+    computervision_client = ComputerVisionClient(endpoint, CognitiveServicesCredentials(subscription_key))
+    url = os.environ["URL"]
+    image_url =f"{url}/{titre}"
+    response = requests.get(image_url)
+    # Vérification du statut de la réponse
+    if response.status_code == 200:
+        telecharger_modif_img(response)
+    qr_code_data = decode_qr_code()
+    with open("C:/Users/naouf/Documents/1-Naoufel/1-projet/6-OCR/Projet-OCR-Naoufel/stockage.jpg", "rb") as f:
+        # print("===== Tag an image - remote =====")
+        read_response = computervision_client.read_in_stream(f,  raw=True)# Call API with URL and raw response (allows you to get the operation location)# Call API with remote image
+        read_operation_location = read_response.headers["Operation-Location"]
+        operation_id = read_operation_location.split("/")[-1]
+        while True:
+            read_result = computervision_client.get_read_result(operation_id)
+            if read_result.status not in ['notStarted', 'running']:
+                break
+            time.sleep(1)
+        if read_result.status == OperationStatusCodes.succeeded:
+            for text_result in read_result.analyze_result.read_results:
+                preligne = ""
+                preH = 150
+                for line in text_result.lines:
+                    if abs(line.bounding_box[-1]-preH)<9:
+                        if preH == None:
+                            preH = line.bounding_box[-1]
+                        preligne = preligne + f' {line.text}'
+                        if liste[-1] in preligne:
+                            liste[-1]= preligne
+                        # print("preH",preH)
+                        # print("preligne",preligne)
+                        # print('-----------------------')
+                    else:
+                        preH = line.bounding_box[-1]
+                        preligne = line.text
+                        liste.append(line.text)
+                        # print("line.text",line.text)
+                        # print("line.box",line.bounding_box[-1])
+                        # print("preligne",preligne)
+                        # print(preH) 
+                    # print("------------------------------------------LIGNE SUIVANTE--------------------------------")  
                
-    print()
-    print("End of Computer Vision quickstart.")
+              
+    # print()
+    # print("End of Computer Vision quickstart.")
 
-    return
-
-
-
+    return {"liste":liste,"qr_code_data":qr_code_data}
 
 
 
 
-""" # Récupérer les coordonnées y de la boîte de délimitation de la ligne
+
+
+
+    
+
+  
+
+
+""" 
+"""
+# Récupérer les coordonnées y de la boîte de délimitation de la ligne
                 y_coordinate = line.bounding_box[1]
 
                 # Si la coordonnée y existe déjà dans le dictionnaire, ajouter la ligne à la liste correspondante

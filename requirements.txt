@@ -4,5 +4,7 @@ python-dotenv
 requests
 azure-ai-vision-imageanalysis
 opencv-python
-
-
+pyodbc
+pyzbar
+azure.cognitiveservices.vision.computervision
+Pillow

@@ -6,10 +6,6 @@ load_dotenv()
 
 def liste_fichier():
     """
-
-    
-    
-    
     """
     année = 2019
     liste_dico_fichier={}
@@ -17,7 +13,7 @@ def liste_fichier():
         liste = []
         header = {'Accept': 'application/json'}
         url = os.getenv('URL')
-        response = requests.get(url+f"?start_date={année}-01", headers = header)
+        response = requests.get(url+f"?start_date={année}-01-01", headers = header)
         status = response.status_code 
         #print(response)   
             # Vérifier si la requête a réussi (code de statut 200)
@@ -32,10 +28,6 @@ def liste_fichier():
             else:
                 liste_dico_fichier[année] = liste
                 année+=1
-        
-        
-    
-
     return {"liste_dico_fichier":liste_dico_fichier}
 
 
