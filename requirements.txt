@@ -8,3 +8,9 @@ pyodbc
 pyzbar
 azure.cognitiveservices.vision.computervision
 Pillow
+pytest
+selenium
+streamlit
+
+
+

@@ -7,6 +7,12 @@ __pycache__/
 *.so
 #Resources
 ImagesFactures/
+testocr.py
+test.py
+stockage.jpg
+pytesseractocr.py
+Dockerfile
+.dockerignore
 # Distribution / packaging
 .Python
 build/

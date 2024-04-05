@@ -4,6 +4,11 @@ import os
 
 
 def telecharger_modif_img(response):
+    """
+    Fonction qui effectue du préprocessing sur les images avant de les envoyées à l'OCR
+    INPUT: response(larequete vers l'API contenant les factures)
+    OUTPUT: None(L'image est stockées en Locale)
+    """
     # Ouvrir l'image depuis le contenu de la réponse
     image = Image.open(BytesIO(response.content))
     # Conversion de l'image en niveaux de gris

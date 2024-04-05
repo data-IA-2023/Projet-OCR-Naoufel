@@ -2,6 +2,12 @@ import requests
 
 # Fonction pour décoder un QR code à partir d'une image en utilisant une API en ligne
 def decode_qr_code():
+    """
+    Fonction qui effectue une requete vers une api afin d'y récupérer les données stockées dans le qrcode 
+    Il en ressort un dictionnaire comprenant les données et le status de la requete
+    INPUT: None
+    OUTPUT: dicti
+    """
     # URL de l'API de décodage des QR codes
     image_path = "stockage.jpg"
     api_url = "https://api.qrserver.com/v1/read-qr-code/"

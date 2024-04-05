@@ -1,18 +1,27 @@
 import re
-
+import math
 
     
 def data_tobdd(liste,qr_code_data):
+                """
+                Fonction qui effectue du prétraitement sur la réponse de l'OCR afin d'identifier les différentes informations 
+                Il en ressort un dictionnaire comprenant les données
+                INPUT: liste(resultat de l'OCR,qr_code_data(les données du qrcode))
+                OUTPUT: data_bdd(dictionnaire contenant toutes les données)
+                """
                 data_todb = {}
-                dico_association = {"INVOICE":"Id_Facture","Issue date":"Date"}
+                dico_association = {"INVOICE":"Id_Facture","Issue date":"Date","issue date":"Date"}
                 liste_prod = []
                 for loop in range(len(liste)):
                     for key in dico_association.keys():
                         if key in liste[loop]:
                             if key == "INVOICE":
                                 data_todb[dico_association[key]] = liste[loop][8:]
+                            elif key == "Issue date":
+                                 data_todb[dico_association[key]] = liste[loop][11:]
                             else:
-                                 data_todb[dico_association[key]] = liste[loop]
+                                 data_todb[dico_association[key]] = liste[loop][11:]
+
                     if loop == 2:
                         data_todb["Vendeur"] = liste[loop].split(" to ")[0]
                         data_todb["Client"] =  liste[loop].split(" to ")[1]
@@ -55,6 +64,35 @@ def data_tobdd(liste,qr_code_data):
                     data_todb["Catégorie"]=qr_code_data['CAT']
                     data_todb['status_request_qrcode']=qr_code_data['status_request']
                 return data_todb
+
+def rempalcement0(dico):
+    """
+    Fonction qui effectue du prétraitement pour remplacer les valeurs manquantes déja indentifiées dans la fonction précedante 
+    Il en ressort un dictionnaire 
+    INPUT: dico(OUTPUT de la fonction précédante)
+    OUTPUT: dictionnaire modifé
+    """
+    listeprix = []
+    count = 0
+
+    for i, produit in enumerate(dico["Produit"]):
+        if produit["qtt"] == "0" or produit["qtt"] == "x" :
+            prixunit = float(produit["prix_unitaire"].split(" ")[0])
+            count = 1
+            index = i
+        else:
+            operation = float(produit["qtt"]) * float(produit["prix_unitaire"].split(" ")[0])
+            listeprix.append(operation)
+
+    if count == 1:
+        remaining_total = float(dico["Prix_Total"].split(" ")[0]) - round(sum(listeprix), 2)
+        qtt_decimal = remaining_total / prixunit
+        if qtt_decimal - math.floor(qtt_decimal) >= 0.5:
+            dico['Produit'][index]['qtt'] = math.ceil(qtt_decimal)
+        else:
+            dico['Produit'][index]['qtt'] = math.floor(qtt_decimal)
+
+    return dico
 
 
 

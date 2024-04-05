@@ -20,6 +20,12 @@ from qrcode import decode_qr_code
 
 
 def OCR(titre):
+    """
+    Fonction qui effectue une requete vers une api afin d'y récupérer les données pour un fichier donné. 
+    Il en ressort un dictionnaire comprenant les données sous forme de liste et les données du qrcode après l'execution de la fonction dédiée
+    INPUT: titre du document
+    OUTPUT: dico 
+    """
     # print(titre)
     liste = []
     '''

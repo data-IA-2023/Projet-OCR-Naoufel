@@ -6,18 +6,25 @@ load_dotenv()
 
 def liste_fichier():
     """
+    Fonction qui effectue une requete vers une api afin d'y récupérer les titres des documents 
+    Il en ressort un dictionnaire comprenant un dctionnaire de valuer triées par années(clef) et le status de la requete
+    INPUT: None
+    OUTPUT: {"liste_dico_fichier":liste_dico_fichier,"status_laod_data":liste_status}
     """
     année = 2019
     liste_dico_fichier={}
+    liste_status = []
     while True:
         liste = []
         header = {'Accept': 'application/json'}
         url = os.getenv('URL')
         response = requests.get(url+f"?start_date={année}-01-01", headers = header)
-        status = response.status_code 
+        status = response.status_code
+        liste_status.append(status) 
         #print(response)   
             # Vérifier si la requête a réussi (code de statut 200)
         if status == 200:
+            
             # Afficher le contenu de la réponse (les documents)
             documents = response.json()
             for doc in documents["invoices"]:
@@ -28,8 +35,7 @@ def liste_fichier():
             else:
                 liste_dico_fichier[année] = liste
                 année+=1
-    return {"liste_dico_fichier":liste_dico_fichier}
-
+    return {"liste_dico_fichier":liste_dico_fichier,"status_laod_data":str(liste_status)}
 
 
 
