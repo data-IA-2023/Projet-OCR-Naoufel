@@ -1,7 +1,9 @@
 # Projet-OCR-Naoufel
 Projet Naoufel DÃ©veloppement d'interface OCR avec Azure
 
-
+# Documentation
+Lien de la présentation: https://docs.google.com/presentation/d/1ZsF5qhoQj_tdZViMEkEwMSoSarV553_z_gki8Twr5lU/edit?usp=sharing
+Lien du rapport: https://docs.google.com/document/d/1QJ73phDJKWQcW6TOUsGE1DYJwAEuBOLcryZVqfAK0L8/edit?usp=sharing
 # Context
 Vous travaillez en tant que développeur⸱se en IA pour le compte d’une ESN.
 Un client exprime un besoin d’évolution pour sa procédure de pré-traitement des factures fournisseurs. Le client souhaite étendre les fonctionnalités de pré-traitement au-delà avec des fonctionnalités d’OCR (ou “reconnaissance optique de caractères”) afin d’obtenir un reporting automatisé de sa comptabilité fournisseurs.
