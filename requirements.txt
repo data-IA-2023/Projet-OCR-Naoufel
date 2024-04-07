@@ -11,6 +11,8 @@ Pillow
 pytest
 selenium
 streamlit
+matplotlib
+seaborn
 
 
 

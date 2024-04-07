@@ -158,6 +158,7 @@ def requetes_sql(dico,DICO_STATUS2):
 
     # print("-------------------------Jointure-------------------------------")
     result_list,Status_SELECT_Jointure = select("Jointure","ID_Facture")
+    result_list_prod,Status_SELECT_Jointure_prod = select("Jointure","Libellé_Produit")
     try:
         for element in dico["Produit"]:
             

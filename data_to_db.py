@@ -10,7 +10,7 @@ def data_tobdd(liste,qr_code_data):
                 OUTPUT: data_bdd(dictionnaire contenant toutes les données)
                 """
                 data_todb = {}
-                dico_association = {"INVOICE":"Id_Facture","Issue date":"Date","issue date":"Date"}
+                dico_association = {"INVOICE":"Id_Facture","Issue date":"Date","issue date":"Date","ssue date":"Date"}
                 liste_prod = []
                 for loop in range(len(liste)):
                     for key in dico_association.keys():

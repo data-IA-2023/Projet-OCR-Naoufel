@@ -11,48 +11,48 @@ from DiscordMonitoring import discord
 
 def module():
     dico_nom_fichier = liste_fichier()
-    # print(dico_nom_fichier["liste_dico_fichier"])
-    #for année in dico_nom_fichier['liste_dico_fichier'].keys():
-    for titre in dico_nom_fichier['liste_dico_fichier'][2019]:
-        result_list,Status_SELECT_redondance = select("Monitoring","ID_Facture")
-        result_listfac,Status_SELECT_redondancefac = select("Facture","ID_Facture")
-        
-        if titre.split("-")[0] not in result_list or titre.split("-")[0] not in result_listfac:
-            # print(titre.split("-")[0])
-            try:
-                DICO_OCR = OCR(titre)
-            except Exception as e:
-                status_text_to_ocr = f"Erreur lors de l'OCR sur les données {titre.split("-")[0]}'  : {e}"
-            else:
-                status_text_to_ocr = "OCR terminé"
-
+    #reversed() : dico_nom_fichier['liste_dico_fichier'].keys()
+    for année in dico_nom_fichier['liste_dico_fichier'].keys():
+        for titre in dico_nom_fichier['liste_dico_fichier'][année]:
+            result_list,Status_SELECT_redondance = select("Monitoring","ID_Facture")
+            result_listfac,Status_SELECT_redondancefac = select("Facture","ID_Facture")
             
-           
-                
-            try:   
-                DICO_DB = data_tobdd(DICO_OCR["liste"],DICO_OCR["qr_code_data"])
-                
-                 
-                DICO_FINAL = rempalcement0(DICO_DB)
-            except Exception as e:
-                status_processing_ocr = f"Erreur lors de la requête INSERT à la base de données  : {e}"
-            else:
-                status_processing_ocr = "Préprocessing terminé"
+            if titre.split("-")[0] not in result_list or titre.split("-")[0] not in result_listfac:
+                # print(titre.split("-")[0])
+                try:
+                    DICO_OCR = OCR(titre)
+                except Exception as e:
+                    status_text_to_ocr = f"Erreur lors de l'OCR sur les données {titre.split("-")[0]}'  : {e}"
+                else:
+                    status_text_to_ocr = "OCR terminé"
 
+                
             
-            DICO_STATUS2 = {"status_load_data":dico_nom_fichier["status_laod_data"],
-                            "status_SELECT_redondance":Status_SELECT_redondance,
-                            "status_text_to_ocr":status_text_to_ocr,
-                            "status_processing_ocr":status_processing_ocr
-                            }
-            # print(DICO_DB)
-            # print(DICO_FINAL)
-            DICO_STATUS = requetes_sql(DICO_FINAL,DICO_STATUS2)
-            print(f"------------------------------------------------------{DICO_FINAL["Id_Facture"]}------------------------------------------------------------------")
-            discord(DICO_STATUS,DICO_STATUS2)
-        else:
-            status_processing_ocr = "Le fichier a déjà été renseigné"
-            print("Le fichier a déjà été renseigné")
+                    
+                try:   
+                    DICO_DB = data_tobdd(DICO_OCR["liste"],DICO_OCR["qr_code_data"])
+                    
+                    
+                    DICO_FINAL = rempalcement0(DICO_DB)
+                except Exception as e:
+                    status_processing_ocr = f"Erreur lors de la requête INSERT à la base de données  : {e}"
+                else:
+                    status_processing_ocr = "Préprocessing terminé"
+
+                
+                DICO_STATUS2 = {"status_load_data":dico_nom_fichier["status_laod_data"],
+                                "status_SELECT_redondance":Status_SELECT_redondance,
+                                "status_text_to_ocr":status_text_to_ocr,
+                                "status_processing_ocr":status_processing_ocr
+                                }
+                # print(DICO_DB)
+                # print(DICO_FINAL)
+                DICO_STATUS = requetes_sql(DICO_FINAL,DICO_STATUS2)
+                print(f"------------------------------------------------------{DICO_FINAL["Id_Facture"]}------------------------------------------------------------------")
+                discord(DICO_STATUS,DICO_STATUS2)
+            else:
+                status_processing_ocr = "Le fichier a déjà été renseigné"
+                print("Le fichier a déjà été renseigné")
     return
 module()
 

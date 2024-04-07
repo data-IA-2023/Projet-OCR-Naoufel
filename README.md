@@ -10,6 +10,7 @@ Le client en question vous donne accès aux sources de sa procédure de traiteme
 
 # Ressources
 Lien API Facture:https://invoiceocrp3.azurewebsites.net/invoices
+Lien API QrCodes:https://api.qrserver.com/v1/read-qr-code/
 
 # Attendus
 En tant que développeur⸱se en IA pour le compte d’une ESN, vous devez :
