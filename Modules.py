@@ -12,8 +12,8 @@ from DiscordMonitoring import discord
 def module():
     dico_nom_fichier = liste_fichier()
     #reversed() : dico_nom_fichier['liste_dico_fichier'].keys()
-    for année in dico_nom_fichier['liste_dico_fichier'].keys():
-        for titre in dico_nom_fichier['liste_dico_fichier'][année]:
+    for année in reversed(dico_nom_fichier['liste_dico_fichier'].keys()):
+        for titre in reversed(dico_nom_fichier['liste_dico_fichier'][année]):
             result_list,Status_SELECT_redondance = select("Monitoring","ID_Facture")
             result_listfac,Status_SELECT_redondancefac = select("Facture","ID_Facture")
             

@@ -1,8 +1,10 @@
 # Projet-OCR-Naoufel
 Projet Naoufel DÃ©veloppement d'interface OCR avec Azure
 
-# Documentation
+# Présentation
 Lien de la présentation: https://docs.google.com/presentation/d/1ZsF5qhoQj_tdZViMEkEwMSoSarV553_z_gki8Twr5lU/edit?usp=sharing
+
+# Rapport
 Lien du rapport: https://docs.google.com/document/d/1QJ73phDJKWQcW6TOUsGE1DYJwAEuBOLcryZVqfAK0L8/edit?usp=sharing
 # Context
 Vous travaillez en tant que développeur⸱se en IA pour le compte d’une ESN.

@@ -23,6 +23,13 @@ if count == 1:
 print(dico)
 
 print(dico)"""
-
+import streamlit as st
 liste=[1,2,6,9]
 print(str(liste))
+st.write("yolo")
+def count():
+    a = 0
+    for loop in range(100000000000):
+        a += loop
+    return a
+count()

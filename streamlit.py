@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 from load_data import liste_fichier
 from dotenv import load_dotenv
+#import threading
+
 import os
 import pyodbc
 import matplotlib.pyplot as plt
@@ -10,7 +12,7 @@ import warnings
 import numpy as np
 # thread = threading.Thread(target=Modules.module)
 # thread.start()
-# liste_nom = liste_fichier()
+liste_nom = liste_fichier()
 load_dotenv()
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
@@ -45,16 +47,21 @@ files_for_selected_year = file_titles["liste_dico_fichier"].get(selected_year, [
 files_for_selected_year.insert(0, "")  # Ajout de la valeur vide
 
 selected_file = st.sidebar.selectbox("Sélectionner un fichier:", files_for_selected_year)
-
-# URL de base pour les fichiers (remplacez cela par votre URL de base)
 base_url = "https://invoiceocrp3.azurewebsites.net/invoices"
-
-# Vérifier si un fichier est sélectionné avant de générer l'URL spécifique
 if selected_file:
-    # Générer l'URL spécifique pour le fichier sélectionné
-    file_url = f"{base_url}/{selected_file}"
-    # Redirection vers l'URL spécifique du fichier sélectionné
-    st.sidebar.markdown(f"[Ouvrir {selected_file.split('-')[0]}]({file_url})")
+    # Obtenez l'URL complète du fichier sélectionné
+    selected_file_url = base_url + "/" + selected_file
+
+    # Afficher l'URL dans un iframe
+    st.markdown("<h1 style='text-align: center;'>Aperçu Facture</h1>", unsafe_allow_html=True)
+    st.markdown(f'<iframe src="{selected_file_url}" width="700" height="300"></iframe>', unsafe_allow_html=True)
+    
+    
+    st.sidebar.markdown(f"[Ouvrir {selected_file.split('-')[0]}]({selected_file_url})")
+# URL de base pour les fichiers (remplacez cela par votre URL de base)
+
+
+
 
 
 
@@ -88,6 +95,11 @@ SQL_SELECT_STATEMENT = "SELECT * FROM sql_db_Naoufel.dbo.Monitoring"
 # Exécution de la requête et lecture des résultats dans un DataFrame
 Monitoring = pd.read_sql(SQL_SELECT_STATEMENT, conn)
 
+SQL_SELECT_STATEMENT = "SELECT * FROM sql_db_Naoufel.dbo.Produits"
+
+# Exécution de la requête et lecture des résultats dans un DataFrame
+df_requete4 = pd.read_sql(SQL_SELECT_STATEMENT, conn)
+
 
 
 
@@ -101,6 +113,9 @@ df_requete['Année_Facturation'] = df_requete['Date_Facturation'].apply(lambda x
 df_requete['Année_Facturation'] = df_requete['Année_Facturation'].replace("019-", "2019")
 df_requete['Année_Facturation'] = df_requete['Année_Facturation'].replace("020-", "2020")
 df_requete['Année_Facturation'] = df_requete['Année_Facturation'].replace("021-", "2021")
+df_requete['Année_Facturation'] = df_requete['Année_Facturation'].replace("022-", "2022")
+df_requete['Année_Facturation'] = df_requete['Année_Facturation'].replace("023-", "2023")
+df_requete['Année_Facturation'] = df_requete['Année_Facturation'].replace("024-", "2024")
 df_requete['Année_Facturation'] = df_requete['Année_Facturation'].astype(float)
 df_requete['Prix_Total'] = df_requete['Prix_Total'].astype(float)
 
@@ -150,7 +165,7 @@ def graph(df_requete,df_requete1):
     df_aggregated = df_requete1.groupby(['Libellé_Produit', 'Année_Facturation'], as_index=False)['Quantity'].sum()
     df_filtered = df_aggregated[df_aggregated['Libellé_Produit'] != 'Inconnu']
     df_sorted = df_filtered.sort_values(by=['Année_Facturation', 'Quantity'], ascending=[True, False])
-
+    
     # Définir une fonction pour sélectionner les trois premiers produits par groupe
     def top_three(group):
         return group.head(3)
@@ -173,7 +188,7 @@ def graph(df_requete,df_requete1):
     st.pyplot()
     
     return
-
+print(df_requete4['Libellé_Produit'].nunique())
 def graphmonitoring(df):
     nombre_de_facture = len(df)
    
@@ -249,7 +264,7 @@ def graphmonitoring(df):
 
 option = st.sidebar.selectbox(
     'Que souhaitez-vous afficher?',
-    ('Aucun', 'Données', 'Graphiques',"Monitoring")
+    ('', 'Données', 'Graphiques',"Monitoring")
 )
 
 # Afficher le graphique correspondant à l'option sélectionnée
